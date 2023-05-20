@@ -19,8 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/user", (req, res) => res.send("beta"));
 
-app.post("/add-book", async (req, res) => {
-  const { email, bookName, authorname, price, description } = req.body;
+app.post("/add-book", auth, async (req, res) => {
+  const { email, bookName, authorname, price, description, userId } = req.body;
   console.log(">>>>>>>>>>>>>", req.body);
 
   const bookes = await BookesModel.create({
@@ -29,13 +29,26 @@ app.post("/add-book", async (req, res) => {
     authorName: authorname,
     price,
     description,
+    user_id: userId,
   });
   console.log(">>>>>>>>>>>>>>>>>>>", bookes);
   res.send({ message: "Book added Successfull", success: true });
 });
-app.get("/getbooks", async function (req, res) {
+app.get("/getbooks", auth, async function (req, res) {
   // const allBooks = await BookesModel.find();
-  const allBooks = await BookesModel.aggregate([{ $sort: { created_at: -1 } }]);
+  const allBooks = await BookesModel.aggregate([
+    {
+      $sort: { created_at: -1 },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "userInfo",
+      },
+    },
+  ]);
   console.log(">>>>>>>>>>>>>>>>>>>allBooks", allBooks);
   res.send({ sucess: true, message: "book found", allBooks });
 });

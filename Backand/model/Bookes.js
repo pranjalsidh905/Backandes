@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const ObjectId = mongoose.ObjectId;
+
 const Schema = mongoose.Schema;
 
 const BookSchema = new Schema(
@@ -9,6 +11,10 @@ const BookSchema = new Schema(
     price: Number,
     publisher: String,
     description: String,
+    user_id: {
+      type: ObjectId,
+      ref: "users",
+    },
     // file: file,
   },
   {
@@ -16,4 +22,5 @@ const BookSchema = new Schema(
   }
 );
 const BookesModel = mongoose.model("bookes", BookSchema);
+
 module.exports = BookesModel;
